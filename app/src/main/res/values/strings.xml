@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Reaction Time Test</string>
+    <string name="menu_title">Reaction Test</string>
+    <string name="start_game_button">Start Game</string>
+    <string name="statistics_button">Statistics</string>
+    <string name="time_left_text">Time left: %s</string>
+    <string name="average_reaction_time_text">Average: %s ms</string>
+    <string name="pause_menu_exit">Exit</string>
+    <string name="pause_menu_continue">Continue</string>
+</resources>
