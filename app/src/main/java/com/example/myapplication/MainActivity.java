@@ -2,10 +2,14 @@ package com.example.myapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
+    private Button gotoGame;
+
+    private Button gotoStatistics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -16,16 +20,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupUI() {
-        Button startGameButton = findViewById(R.id.start_game_button);
-        Button statisticsButton = findViewById(R.id.statistics_button);
+        gotoGame = findViewById(R.id.start_game_button);
 
-        startGameButton.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, GameActivity.class);
-            startActivity(intent);
+        gotoGame.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent (MainActivity.this, GameActivity.class);
+                startActivity(intent);
+                finish();
+            }
         });
 
-        statisticsButton.setOnClickListener(v -> {
-            // переход к статистике
+        gotoStatistics = findViewById(R.id.statistics_button);
+
+        gotoStatistics.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, StatisticsActivity.class);
+                startActivity(intent);
+                finish();
+            }
         });
+
     }
 }

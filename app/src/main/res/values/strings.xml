@@ -5,6 +5,9 @@
     <string name="statistics_button">Statistics</string>
     <string name="time_left_text">Time left: %s</string>
     <string name="average_reaction_time_text">Average: %s ms</string>
-    <string name="pause_menu_exit">Exit</string>
-    <string name="pause_menu_continue">Continue</string>
+    <string name="statistics_info">some stats...</string>
+    <string name="back_button">Back</string>
+    <string name="pause_text">Pause</string>
+    <string name="resume_button">Resume</string>
+    <string name="exit_button">Exit</string>
 </resources>
