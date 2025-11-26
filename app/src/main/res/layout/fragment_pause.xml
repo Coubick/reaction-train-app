@@ -18,17 +18,27 @@
         android:id="@+id/resume_button"
         android:layout_width="100dp"
         android:layout_height="50dp"
-        android:layout_marginBottom="50dp"
         android:layout_gravity="center"
+        android:layout_marginBottom="85dp"
+        android:layout_marginTop="20dp"
         android:fontFamily="@font/baloo_bhai_2"
         android:text="@string/resume_button" />
+
+    <Button
+        android:id="@+id/restart_button"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/baloo_bhai_2"
+        android:text="@string/reset_button" />
 
     <Button
         android:id="@+id/exit_button"
         android:layout_width="100dp"
         android:layout_height="50dp"
-        android:layout_marginTop="50dp"
         android:layout_gravity="center"
+        android:layout_marginTop="105dp"
         android:fontFamily="@font/baloo_bhai_2"
         android:text="@string/exit_button" />
 

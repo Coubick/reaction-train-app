@@ -13,7 +13,8 @@
         android:theme="@style/Theme.MyApplication">
         <activity
             android:name=".PauseDialogFragment"
-            android:exported="false" />
+            android:exported="false"
+            tools:ignore="Instantiatable" />
         <activity
             android:name=".StatisticsActivity"
             android:exported="false" />

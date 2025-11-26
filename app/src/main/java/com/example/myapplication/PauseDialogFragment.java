@@ -13,16 +13,20 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 
-import java.util.Objects;
 
 
 public class PauseDialogFragment extends DialogFragment {
 
     private PauseMenuListener listener;
 
+    private Button resumeButton;
+    private Button exitButton;
+    Button restartButton;
+
     public interface PauseMenuListener {
         void onResumeGame();
-        void onExitToMenu();
+
+        void onRestartGame();
     }
 
     public static PauseDialogFragment newInstance() {
@@ -61,22 +65,21 @@ public class PauseDialogFragment extends DialogFragment {
     }
 
     private void setupViews(View view) {
-        Button resumeButton = view.findViewById(R.id.resume_button);
-//        Button restartButton = view.findViewById(R.id.restart_button);
-        Button exitButton = view.findViewById(R.id.exit_button);
+        resumeButton = view.findViewById(R.id.resume_button);
+        exitButton = view.findViewById(R.id.exit_button);
+        restartButton = view.findViewById(R.id.restart_button);
 
         resumeButton.setOnClickListener(v -> {
             listener.onResumeGame();
             dismiss();
         });
 
-//        restartButton.setOnClickListener(v -> {
-//            listener.onRestartGame();
-//            dismiss();
-//        });
+        restartButton.setOnClickListener(v -> {
+            listener.onRestartGame();
+            dismiss();
+        });
 
         exitButton.setOnClickListener(v -> {
-            listener.onExitToMenu();
             dismiss();
         });
     }
