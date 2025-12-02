@@ -27,6 +27,8 @@ public class PauseDialogFragment extends DialogFragment {
         void onResumeGame();
 
         void onRestartGame();
+
+        void onExitGame();
     }
 
     public static PauseDialogFragment newInstance() {
@@ -80,6 +82,7 @@ public class PauseDialogFragment extends DialogFragment {
         });
 
         exitButton.setOnClickListener(v -> {
+            listener.onExitGame();
             dismiss();
         });
     }

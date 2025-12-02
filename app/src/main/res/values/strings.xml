@@ -4,7 +4,7 @@
     <string name="start_game_button">Start Game</string>
     <string name="statistics_button">Statistics</string>
     <string name="time_left_text">Time left: 00:00</string>
-    <string name="average_reaction_time_text">Average: %s ms</string>
+    <string name="average_reaction_time_text">Average: ??? ms</string>
     <string name="statistics_info">some stats...</string>
     <string name="back_button">Back</string>
     <string name="pause_text">Pause</string>

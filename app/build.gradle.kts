@@ -40,6 +40,7 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.firebase.inappmessaging)
     implementation("androidx.fragment:fragment:1.8.9")
+    implementation(libs.camera.camera2.pipe)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
