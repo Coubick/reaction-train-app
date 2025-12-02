@@ -105,7 +105,7 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
 
     @Override
     public void onExitGame() {
-        // 1. Остановите все игровые процессы
+        // остановка всех игровых процессов
         if (gameManage != null) {
             gameManage.pause();
         }
@@ -156,6 +156,7 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
             @Override
             public void onFinish() {
                 isTimerRunning = false;
+                gameManage.pause();
             }
 
             @Override

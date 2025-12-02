@@ -99,6 +99,7 @@ public class GameManage{
         });
 
         gameField.addView(dot);
+        lastDotTime = System.currentTimeMillis();
     }
 
     private void recordReactionTime(long time) {
@@ -112,14 +113,17 @@ public class GameManage{
     }
 
     public void start(){
+        isRunning = true;
         spawnHandler.postDelayed(this::createDot, 0);
     }
 
     public void pause(){
+        isRunning = false;
         spawnHandler.removeCallbacksAndMessages(null);
     }
 
     public void resume(){
+        isRunning = true;
         spawnHandler.postDelayed(this::spawnNextDot, getRandomDelay());
     }
 
