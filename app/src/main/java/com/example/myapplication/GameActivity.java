@@ -17,17 +17,23 @@ import androidx.fragment.app.DialogFragment;
 import java.util.Locale;
 
 public class GameActivity extends AppCompatActivity implements PauseDialogFragment.PauseMenuListener {
-    private CountDownTimer initialCountDown;
-    private long initialTimeLeft;
-    private TextView textViewInitialCountDown;
+    private TextView textViewPrepareCountDown;
     private AppCompatImageButton pauseButton;
     private GameManage gameManage;
-    private static final long START_TIME = 30000;
+    private static long startTime = 120000;
     private TextView textViewCountDown;
-    private long timeLeft = START_TIME;
+    private long timeLeft = startTime;
     private CountDownTimer countDownTimer;
     private boolean isPaused = false;
     private boolean isTimerRunning;
+
+    private boolean isPreparing = true;
+
+    private static final long PREPARE_TIME = 4000;
+
+    private long prepareTimeLeft = PREPARE_TIME;
+
+    private long pauseBeginTime;
 
     private TextView averageReactionView;
 
@@ -39,14 +45,14 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
 
         gameManage = new GameManage(this);
 
-        textViewInitialCountDown = findViewById(R.id.initial_countdown);
+        textViewPrepareCountDown = findViewById(R.id.initial_countdown);
         textViewCountDown = findViewById(R.id.timer_text_view);
         textViewCountDown.setText("00:30:00");
         averageReactionView = findViewById(R.id.average_reaction_text_view);
         pauseButton = findViewById(R.id.pause_button);
 
-        startInitialTimer();
         setupUI();
+        startGame();
     }
 
     @SuppressLint("WrongViewCast")
@@ -56,38 +62,58 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
         pauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isTimerRunning){
-                    pauseTimer();
-                } else{
-                    startTimer();
-                }
+                pauseTimer();
                 openDialog();
+                pauseBeginTime = System.currentTimeMillis();
+                gameManage.pause();
             }
         });
     }
 
 
-    private void showPauseMenu() {
-        if (!isPaused) {
-            pauseGame();
-            PauseDialogFragment dialog = PauseDialogFragment.newInstance();
-            dialog.show(getSupportFragmentManager(), "pause_menu");
-        }
-    }
-
     private void startGame(){
-        isPaused = false;
-        gameManage.start();
+        isPreparing = true;
+        prepareTimeLeft = PREPARE_TIME; // 4000
+        textViewPrepareCountDown.setVisibility(VISIBLE);
+
+        countDownTimer = new CountDownTimer(startTime + PREPARE_TIME, 1) {
+
+            @Override
+            public void onTick(long millisecondsUntilFinish) {
+                if (isPreparing){
+                    prepareTimeLeft = millisecondsUntilFinish - startTime;
+                    if (prepareTimeLeft <= 0){
+                        isPreparing = false;
+                        textViewPrepareCountDown.setVisibility(INVISIBLE);
+                        textViewCountDown.setVisibility(VISIBLE);
+                        gameManage.start();
+                    } else {
+                        updateInitialCountDownText();
+                    }
+                } else {
+                    timeLeft = millisecondsUntilFinish;
+                    updateCountDownText();
+                }
+            }
+
+            @Override
+            public void onFinish() {
+                isTimerRunning = false;
+            }
+
+        }.start();
+        isTimerRunning = true;
     }
 
-    private void pauseGame(){
-        isPaused = true;
-        gameManage.pause();
+    private void updateInitialCountDownText() {
+        int seconds = (int) prepareTimeLeft / 1000;
+        textViewPrepareCountDown.setText(String.valueOf(seconds));
     }
 
     private void resumeGame(){
         isPaused = false;
-        startInitialTimer();
+        startTime = timeLeft;
+        startGame();
         gameManage.resume();
     }
 
@@ -98,8 +124,8 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
 
     @Override
     public void onRestartGame() {
+        // TODO
         resetTimer();
-        startInitialTimer();
         gameManage.start();
     }
 
@@ -112,9 +138,6 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
         if (countDownTimer != null) {
             countDownTimer.cancel();
         }
-        if (initialCountDown != null) {
-            initialCountDown.cancel();
-        }
 
         Intent intent = new Intent(GameActivity.this, MainActivity.class);
         startActivity(intent);
@@ -126,57 +149,17 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
         dialogFragment.show(getSupportFragmentManager(), "example");
     }
 
-    private void startInitialTimer(){
-        textViewInitialCountDown.setVisibility(VISIBLE);
-        initialTimeLeft = 4000;
-        initialCountDown = new CountDownTimer(initialTimeLeft, 1000) {
-            @Override
-            public void onFinish() {
-                textViewInitialCountDown.setVisibility(INVISIBLE);
-                startTimer();
-                startGame();
-            }
+    private void pauseTimer() {
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+            countDownTimer = null;
+        }
 
-            @Override
-            public void onTick(long millisUntilFinished) {
-                initialTimeLeft = millisUntilFinished;
-                updateInitialCountdownText();
-            }
-        }.start();
-    }
-
-    private void updateInitialCountdownText(){
-        int seconds = (int) (initialTimeLeft / 1000);
-        String time = String.valueOf(seconds);
-        textViewInitialCountDown.setText(time);
-    }
-
-    private void startTimer(){
-        countDownTimer = new CountDownTimer(timeLeft, 1) {
-            @Override
-            public void onFinish() {
-                isTimerRunning = false;
-                gameManage.pause();
-            }
-
-            @Override
-            public void onTick(long millisUntilFinished) {
-                timeLeft = millisUntilFinished;
-                updateCountDownText();
-            }
-        }.start();
-
-        isTimerRunning = true;
-    }
-
-    private void pauseTimer(){
-        initialCountDown.cancel();
-        countDownTimer.cancel();
         isTimerRunning = false;
     }
 
     private void resetTimer(){
-        timeLeft = START_TIME;
+        timeLeft = startTime;
         updateCountDownText();
     }
 

@@ -21,6 +21,9 @@ public class GameManage{
 
     private long lastDotTime;
 
+    private long pauseBeginTime;
+    private long fullPauseTime = 0;
+
     /**
      * spawnHandler - аналог Timer, но в UI
      *
@@ -61,16 +64,8 @@ public class GameManage{
             return;
         }
 
-        // Проверяем, известны ли размеры
-        if (gameField.getWidth() == 0 || gameField.getHeight() == 0) {
-            // Откладываем вызов до следующего кадра, когда размеры будут известны
-            gameField.post(this::createDot);
-            return;
-        }
-
         int width = gameField.getWidth();
         int height = gameField.getHeight();
-        System.out.println("GameField size: " + width + " x " + height);
 
         int dotSize = 100;
         int maxX = Math.max(1, width - dotSize);
@@ -92,7 +87,10 @@ public class GameManage{
         dot.setLayoutParams(params);
 
         dot.setOnClickListener(v -> {
-            long reactionTime = System.currentTimeMillis() - lastDotTime;
+            long reactionTime;
+            reactionTime = System.currentTimeMillis() - lastDotTime - fullPauseTime;
+
+            fullPauseTime = 0;
             recordReactionTime(reactionTime);
             gameField.removeView(v);
             spawnNextDot();
@@ -114,17 +112,21 @@ public class GameManage{
 
     public void start(){
         isRunning = true;
-        spawnHandler.postDelayed(this::createDot, 0);
+        spawnHandler.postDelayed(this::createDot, getRandomDelay());
     }
 
     public void pause(){
+        pauseBeginTime = System.currentTimeMillis();
         isRunning = false;
         spawnHandler.removeCallbacksAndMessages(null);
     }
 
     public void resume(){
+        // fullPauseTime вычитается из времени, затраченного на
+        // нажатие на кнопку (иначе время паузы засчитвается как время реакции)
+        fullPauseTime = System.currentTimeMillis() - pauseBeginTime;
         isRunning = true;
-        spawnHandler.postDelayed(this::spawnNextDot, getRandomDelay());
+        spawnHandler.postDelayed(this::spawnNextDot, 4000);
     }
 
     public void reset(){
