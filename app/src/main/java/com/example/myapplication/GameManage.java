@@ -17,12 +17,13 @@ public class GameManage{
     private final Random random = new Random();
     private final GameActivity activity;
 
-    private boolean isRunning;
-
+    private boolean isRunning = false;
     private long lastDotTime;
 
     private long pauseBeginTime;
     private long fullPauseTime = 0;
+
+    private boolean isDotActive = false;
 
     /**
      * spawnHandler - аналог Timer, но в UI
@@ -47,7 +48,7 @@ public class GameManage{
     }
 
     private void spawnNextDot() {
-        if (!isRunning) return;
+        if (!isRunning || isDotActive) return; // если пауза или точка заспавнена, то не метод не вызывается
 
         long delay = 300 + (long)(Math.random() * 1200);
         spawnHandler.postDelayed(() -> {
@@ -58,6 +59,7 @@ public class GameManage{
         }, delay);
     }
     private void createDot() {
+        isDotActive = true; // точка зспавнена
         gameField = activity.findViewById(R.id.game_field);
         if (gameField == null) {
             System.out.println("gameField is NULL!");
@@ -86,15 +88,17 @@ public class GameManage{
 
         dot.setLayoutParams(params);
 
-        dot.setOnClickListener(v -> {
-            long reactionTime;
-            reactionTime = System.currentTimeMillis() - lastDotTime - fullPauseTime;
-
-            fullPauseTime = 0;
-            recordReactionTime(reactionTime);
-            gameField.removeView(v);
-            spawnNextDot();
-        });
+        if (isRunning) {
+            dot.setOnClickListener(v -> {
+                isDotActive = false; // на точку нажали => не заспавнена
+                long reactionTime = System.currentTimeMillis() - lastDotTime - fullPauseTime;
+                System.out.println("!!!!!!!!!!!!!!!!! R E A C T I O N  T I M E: " + reactionTime);
+                fullPauseTime = 0;
+                recordReactionTime(reactionTime);
+                gameField.removeView(v);
+                spawnNextDot();
+            });
+        }
 
         gameField.addView(dot);
         lastDotTime = System.currentTimeMillis();
@@ -112,13 +116,14 @@ public class GameManage{
 
     public void start(){
         isRunning = true;
-        spawnHandler.postDelayed(this::createDot, getRandomDelay());
+        spawnHandler.postDelayed(this::createDot, 1500);
     }
 
-    public void pause(){
-        pauseBeginTime = System.currentTimeMillis();
+    public void pause(long pauseBeginTime){
+        this.pauseBeginTime = pauseBeginTime;
         isRunning = false;
         spawnHandler.removeCallbacksAndMessages(null);
+
     }
 
     public void resume(){
@@ -126,7 +131,8 @@ public class GameManage{
         // нажатие на кнопку (иначе время паузы засчитвается как время реакции)
         fullPauseTime = System.currentTimeMillis() - pauseBeginTime;
         isRunning = true;
-        spawnHandler.postDelayed(this::spawnNextDot, 4000);
+        if (!isDotActive) // если точка не заспавнена - то заспавнить. если заспавнена, то метод завершается...
+            spawnHandler.postDelayed(this::spawnNextDot, 4000); // не спавнится сразу после паузы
     }
 
     public void reset(){

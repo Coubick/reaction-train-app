@@ -23,7 +23,7 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
     private static long startTime = 120000;
     private TextView textViewCountDown;
     private long timeLeft = startTime;
-    private CountDownTimer countDownTimer;
+    private CountDownTimer mainCountDownTimer;
     private boolean isPaused = false;
     private boolean isTimerRunning;
 
@@ -65,7 +65,7 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
                 pauseTimer();
                 openDialog();
                 pauseBeginTime = System.currentTimeMillis();
-                gameManage.pause();
+                gameManage.pause(pauseBeginTime);
             }
         });
     }
@@ -76,7 +76,7 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
         prepareTimeLeft = PREPARE_TIME; // 4000
         textViewPrepareCountDown.setVisibility(VISIBLE);
 
-        countDownTimer = new CountDownTimer(startTime + PREPARE_TIME, 1) {
+        mainCountDownTimer = new CountDownTimer(startTime + PREPARE_TIME, 1) {
 
             @Override
             public void onTick(long millisecondsUntilFinish) {
@@ -112,8 +112,36 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
 
     private void resumeGame(){
         isPaused = false;
+        isPreparing = true;
         startTime = timeLeft;
-        startGame();
+        prepareTimeLeft = PREPARE_TIME; // 4000
+        textViewPrepareCountDown.setVisibility(VISIBLE);
+        mainCountDownTimer = new CountDownTimer(PREPARE_TIME + timeLeft, 1) {
+
+            @Override
+            public void onTick(long millisecondsUntilFinish) {
+                if (isPreparing) {
+                    prepareTimeLeft = millisecondsUntilFinish - startTime;
+                    if (prepareTimeLeft <= 0) {
+                        isPreparing = false;
+                        textViewPrepareCountDown.setVisibility(INVISIBLE);
+                        textViewCountDown.setVisibility(VISIBLE);
+                    } else {
+                        updateInitialCountDownText();
+                    }
+                } else {
+                    timeLeft = millisecondsUntilFinish;
+                    updateCountDownText();
+                }
+            }
+
+            @Override
+            public void onFinish() {
+                isTimerRunning = false;
+            }
+
+        }.start();
+        isTimerRunning = true;
         gameManage.resume();
     }
 
@@ -133,10 +161,10 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
     public void onExitGame() {
         // остановка всех игровых процессов
         if (gameManage != null) {
-            gameManage.pause();
+            gameManage.pause(0);
         }
-        if (countDownTimer != null) {
-            countDownTimer.cancel();
+        if (mainCountDownTimer != null) {
+            mainCountDownTimer.cancel();
         }
 
         Intent intent = new Intent(GameActivity.this, MainActivity.class);
@@ -150,9 +178,9 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
     }
 
     private void pauseTimer() {
-        if (countDownTimer != null) {
-            countDownTimer.cancel();
-            countDownTimer = null;
+        if (mainCountDownTimer != null) {
+            mainCountDownTimer.cancel();
+            mainCountDownTimer = null;
         }
 
         isTimerRunning = false;
