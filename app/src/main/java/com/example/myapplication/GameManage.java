@@ -1,7 +1,6 @@
 package com.example.myapplication;
 
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.widget.ImageButton;
@@ -17,13 +16,20 @@ public class GameManage{
     private final Random random = new Random();
     private final GameActivity activity;
 
+    private ImageButton dot;
+
     private boolean isRunning = false;
     private long lastDotTime;
 
     private long pauseBeginTime;
     private long fullPauseTime = 0;
 
+
+    private final long PREAPRE_TIME = 4000;
+
     private boolean isDotActive = false;
+
+    private boolean isPreparationPeriod = false;
 
     /**
      * spawnHandler - аналог Timer, но в UI
@@ -38,14 +44,6 @@ public class GameManage{
      * позволяет выполнить код в отложенное время и выполнить код не в своем потоке
      */
     private final Handler spawnHandler = new Handler(Looper.getMainLooper());
-
-    private long getRandomDelay(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-            return random.nextLong(1000);
-        }
-
-        return 555;
-    }
 
     private void spawnNextDot() {
         if (!isRunning || isDotActive) return; // если пауза или точка заспавнена, то не метод не вызывается
@@ -76,7 +74,7 @@ public class GameManage{
         int x = random.nextInt(maxX + 1);
         int y = random.nextInt(maxY + 1);
 
-        ImageButton dot = new ImageButton(activity);
+        dot = new ImageButton(activity);
         dot.setImageResource(R.drawable.dot);
         dot.setBackgroundColor(Color.TRANSPARENT);
 
@@ -90,7 +88,7 @@ public class GameManage{
 
         if (isRunning) {
             dot.setOnClickListener(v -> {
-                isDotActive = false; // на точку нажали => не заспавнена
+                isDotActive = false;
                 long reactionTime = System.currentTimeMillis() - lastDotTime - fullPauseTime;
                 System.out.println("!!!!!!!!!!!!!!!!! R E A C T I O N  T I M E: " + reactionTime);
                 fullPauseTime = 0;
@@ -99,7 +97,6 @@ public class GameManage{
                 spawnNextDot();
             });
         }
-
         gameField.addView(dot);
         lastDotTime = System.currentTimeMillis();
     }
@@ -116,27 +113,63 @@ public class GameManage{
 
     public void start(){
         isRunning = true;
-        spawnHandler.postDelayed(this::createDot, 1500);
+        spawnHandler.postDelayed(this::createDot, 1000);
     }
 
-    public void pause(long pauseBeginTime){
-        this.pauseBeginTime = pauseBeginTime;
+    public void pause(){
+        pauseBeginTime = System.currentTimeMillis();
         isRunning = false;
         spawnHandler.removeCallbacksAndMessages(null);
-
     }
 
     public void resume(){
-        // fullPauseTime вычитается из времени, затраченного на
-        // нажатие на кнопку (иначе время паузы засчитвается как время реакции)
-        fullPauseTime = System.currentTimeMillis() - pauseBeginTime;
+        long resumeClickedTime = System.currentTimeMillis();
+        isPreparationPeriod = true; // Начинаем период подготовки
+
+        /**
+         * нажали resume -> вычитаем время, в которое пауза началась = время, затраченное на паузу
+         * вычли PREPARE_TIME = вычли время, затраченное на обратный отсчет
+         */
+        fullPauseTime = resumeClickedTime - pauseBeginTime - PREAPRE_TIME;
+
+        spawnHandler.postDelayed(() -> {
+            isPreparationPeriod = false;
+            System.out.println("Preparation period finished, clicks enabled");
+            if (isDotActive){
+                lastDotTime += PREAPRE_TIME;
+            }
+        }, PREAPRE_TIME);
+
         isRunning = true;
-        if (!isDotActive) // если точка не заспавнена - то заспавнить. если заспавнена, то метод завершается...
-            spawnHandler.postDelayed(this::spawnNextDot, 4000); // не спавнится сразу после паузы
+        if (!isDotActive) // если точка не заспавнена - то заспавнить. если заспавнена, то ждем нажатия
+            spawnHandler.postDelayed(this::spawnNextDot, PREAPRE_TIME); // не спавнится сразу после паузы
+        else
+            // Если точка уже есть, обновляем слушатель с проверкой подготовки
+            updateDotClickListener();
     }
 
     public void reset(){
 
+    }
+
+    private void updateDotClickListener() {
+        if (dot == null) return;
+
+        dot.setOnClickListener(v -> {
+            // Проверяем, не в периоде ли подготовки
+            if (isPreparationPeriod) {
+                System.out.println("Click blocked during preparation period!");
+                return; // Игнорируем клик
+            }
+
+            isDotActive = false;
+            long reactionTime = System.currentTimeMillis() - lastDotTime - fullPauseTime - PREAPRE_TIME;
+            System.out.println("Reaction time: " + reactionTime);
+            fullPauseTime = 0;
+            recordReactionTime(reactionTime);
+            gameField.removeView(v);
+            spawnNextDot();
+        });
     }
 
 

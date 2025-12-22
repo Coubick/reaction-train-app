@@ -20,21 +20,15 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
     private TextView textViewPrepareCountDown;
     private AppCompatImageButton pauseButton;
     private GameManage gameManage;
-    private static long startTime = 120000;
+    private static long startTime = 60000;
     private TextView textViewCountDown;
     private long timeLeft = startTime;
     private CountDownTimer mainCountDownTimer;
-    private boolean isPaused = false;
     private boolean isTimerRunning;
-
     private boolean isPreparing = true;
-
     private static final long PREPARE_TIME = 4000;
 
     private long prepareTimeLeft = PREPARE_TIME;
-
-    private long pauseBeginTime;
-
     private TextView averageReactionView;
 
     @SuppressLint("WrongViewCast")
@@ -47,7 +41,7 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
 
         textViewPrepareCountDown = findViewById(R.id.initial_countdown);
         textViewCountDown = findViewById(R.id.timer_text_view);
-        textViewCountDown.setText("00:30:00");
+        textViewCountDown.setText("00:60:00");
         averageReactionView = findViewById(R.id.average_reaction_text_view);
         pauseButton = findViewById(R.id.pause_button);
 
@@ -64,14 +58,14 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
             public void onClick(View v) {
                 pauseTimer();
                 openDialog();
-                pauseBeginTime = System.currentTimeMillis();
-                gameManage.pause(pauseBeginTime);
+                gameManage.pause();
             }
         });
     }
 
 
     private void startGame(){
+        gameManage = new GameManage(this);
         isPreparing = true;
         prepareTimeLeft = PREPARE_TIME; // 4000
         textViewPrepareCountDown.setVisibility(VISIBLE);
@@ -111,7 +105,6 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
     }
 
     private void resumeGame(){
-        isPaused = false;
         isPreparing = true;
         startTime = timeLeft;
         prepareTimeLeft = PREPARE_TIME; // 4000
@@ -142,6 +135,7 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
 
         }.start();
         isTimerRunning = true;
+        long resumeStartTime = System.currentTimeMillis();
         gameManage.resume();
     }
 
@@ -159,10 +153,12 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
 
     @Override
     public void onExitGame() {
+        startTime = 60000;
         // остановка всех игровых процессов
         if (gameManage != null) {
-            gameManage.pause(0);
+            gameManage.pause();
         }
+
         if (mainCountDownTimer != null) {
             mainCountDownTimer.cancel();
         }
