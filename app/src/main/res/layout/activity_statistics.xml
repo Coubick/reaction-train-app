@@ -21,8 +21,8 @@
 
     <Button
         android:id="@+id/back_to_menu_button"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_width="89dp"
+        android:layout_height="42dp"
         android:layout_marginTop="16dp"
         android:fontFamily="@font/baloo_bhai_2"
         android:text="@string/back_button"

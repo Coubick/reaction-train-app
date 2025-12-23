@@ -16,7 +16,7 @@ import androidx.fragment.app.DialogFragment;
 
 import java.util.Locale;
 
-public class GameActivity extends AppCompatActivity implements PauseDialogFragment.PauseMenuListener {
+public class GameActivity extends AppCompatActivity implements PauseDialogFragment.PauseMenuListener, FinishDialogFragment.FinishMenuListener{
     private TextView textViewPrepareCountDown;
     private AppCompatImageButton pauseButton;
     private GameManage gameManage;
@@ -57,7 +57,7 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
             @Override
             public void onClick(View v) {
                 pauseTimer();
-                openDialog();
+                openPauseDialog();
                 gameManage.pause();
             }
         });
@@ -93,6 +93,8 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
             @Override
             public void onFinish() {
                 isTimerRunning = false;
+                gameManage.pause();
+                openFinishDialog();
             }
 
         }.start();
@@ -135,7 +137,6 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
 
         }.start();
         isTimerRunning = true;
-        long resumeStartTime = System.currentTimeMillis();
         gameManage.resume();
     }
 
@@ -147,8 +148,9 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
     @Override
     public void onRestartGame() {
         // TODO
+        updateAverageReaction(0);
         resetTimer();
-        gameManage.start();
+        startGame();
     }
 
     @Override
@@ -168,8 +170,13 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
         finish();
     }
 
-    private void openDialog() {
+    private void openPauseDialog() {
         DialogFragment dialogFragment = new PauseDialogFragment();
+        dialogFragment.show(getSupportFragmentManager(), "example");
+    }
+
+    private void openFinishDialog() {
+        DialogFragment dialogFragment = new FinishDialogFragment();
         dialogFragment.show(getSupportFragmentManager(), "example");
     }
 

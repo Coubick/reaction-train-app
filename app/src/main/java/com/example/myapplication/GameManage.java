@@ -112,6 +112,7 @@ public class GameManage{
     }
 
     public void start(){
+        resetGameStats();
         isRunning = true;
         spawnHandler.postDelayed(this::createDot, 1000);
     }
@@ -148,10 +149,6 @@ public class GameManage{
             updateDotClickListener();
     }
 
-    public void reset(){
-
-    }
-
     private void updateDotClickListener() {
         if (dot == null) return;
 
@@ -172,5 +169,8 @@ public class GameManage{
         });
     }
 
-
+    private void resetGameStats(){
+        totalClicks = 0;
+        totalReactionTime = 0;
+    }
 }
