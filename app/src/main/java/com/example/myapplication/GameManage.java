@@ -25,28 +25,15 @@ public class GameManage{
     private long fullPauseTime = 0;
 
 
-    private final long PREAPRE_TIME = 4000;
+    private final long PREPARE_TIME = 4000;
 
     private boolean isDotActive = false;
 
     private boolean isPreparationPeriod = false;
-
-    /**
-     * spawnHandler - аналог Timer, но в UI
-     *
-     * Handler - это механизм, который позволяет работать с очередью сообщений.
-     * Он привязан к конкретному потоку и работает с его очередью.
-     * Handler умеет помещать сообщения в очередь. При этом он ставит самого
-     * себя в качестве получателя этого сообщения. И когда приходит время,
-     * система достает сообщение из очереди и отправляет его адресату (т.е. в
-     * Handler) на обработку.
-     *
-     * позволяет выполнить код в отложенное время и выполнить код не в своем потоке
-     */
     private final Handler spawnHandler = new Handler(Looper.getMainLooper());
 
     private void spawnNextDot() {
-        if (!isRunning || isDotActive) return; // если пауза или точка заспавнена, то не метод не вызывается
+        if (!isRunning || isDotActive) return;
 
         long delay = 300 + (long)(Math.random() * 1200);
         spawnHandler.postDelayed(() -> {
@@ -57,7 +44,7 @@ public class GameManage{
         }, delay);
     }
     private void createDot() {
-        isDotActive = true; // точка зспавнена
+        isDotActive = true;
         gameField = activity.findViewById(R.id.game_field);
         if (gameField == null) {
             System.out.println("gameField is NULL!");
@@ -67,7 +54,7 @@ public class GameManage{
         int width = gameField.getWidth();
         int height = gameField.getHeight();
 
-        int dotSize = 100;
+        int dotSize = 300;
         int maxX = Math.max(1, width - dotSize);
         int maxY = Math.max(1, height - dotSize);
 
@@ -125,27 +112,21 @@ public class GameManage{
 
     public void resume(){
         long resumeClickedTime = System.currentTimeMillis();
-        isPreparationPeriod = true; // Начинаем период подготовки
-
-        /**
-         * нажали resume -> вычитаем время, в которое пауза началась = время, затраченное на паузу
-         * вычли PREPARE_TIME = вычли время, затраченное на обратный отсчет
-         */
-        fullPauseTime = resumeClickedTime - pauseBeginTime - PREAPRE_TIME;
+        isPreparationPeriod = true;
+        fullPauseTime = resumeClickedTime - pauseBeginTime - PREPARE_TIME;
 
         spawnHandler.postDelayed(() -> {
             isPreparationPeriod = false;
             System.out.println("Preparation period finished, clicks enabled");
             if (isDotActive){
-                lastDotTime += PREAPRE_TIME;
+                lastDotTime += PREPARE_TIME;
             }
-        }, PREAPRE_TIME);
+        }, PREPARE_TIME);
 
         isRunning = true;
-        if (!isDotActive) // если точка не заспавнена - то заспавнить. если заспавнена, то ждем нажатия
-            spawnHandler.postDelayed(this::spawnNextDot, PREAPRE_TIME); // не спавнится сразу после паузы
+        if (!isDotActive)
+            spawnHandler.postDelayed(this::spawnNextDot, PREPARE_TIME);
         else
-            // Если точка уже есть, обновляем слушатель с проверкой подготовки
             updateDotClickListener();
     }
 
@@ -153,14 +134,13 @@ public class GameManage{
         if (dot == null) return;
 
         dot.setOnClickListener(v -> {
-            // Проверяем, не в периоде ли подготовки
             if (isPreparationPeriod) {
                 System.out.println("Click blocked during preparation period!");
-                return; // Игнорируем клик
+                return;
             }
 
             isDotActive = false;
-            long reactionTime = System.currentTimeMillis() - lastDotTime - fullPauseTime - PREAPRE_TIME;
+            long reactionTime = System.currentTimeMillis() - lastDotTime - fullPauseTime - PREPARE_TIME;
             System.out.println("Reaction time: " + reactionTime);
             fullPauseTime = 0;
             recordReactionTime(reactionTime);
@@ -172,5 +152,15 @@ public class GameManage{
     private void resetGameStats(){
         totalClicks = 0;
         totalReactionTime = 0;
+    }
+
+    public void removeDot(){
+        if (dot != null && gameField != null) {
+            gameField.removeView(dot);
+            dot = null;
+            isDotActive = false;
+        }
+
+        spawnHandler.removeCallbacksAndMessages(null);
     }
 }

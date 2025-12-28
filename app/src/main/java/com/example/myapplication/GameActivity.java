@@ -109,7 +109,7 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
     private void resumeGame(){
         isPreparing = true;
         startTime = timeLeft;
-        prepareTimeLeft = PREPARE_TIME; // 4000
+        prepareTimeLeft = PREPARE_TIME;
         textViewPrepareCountDown.setVisibility(VISIBLE);
         mainCountDownTimer = new CountDownTimer(PREPARE_TIME + timeLeft, 1) {
 
@@ -133,6 +133,8 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
             @Override
             public void onFinish() {
                 isTimerRunning = false;
+                gameManage.pause();
+                openFinishDialog();
             }
 
         }.start();
@@ -147,7 +149,7 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
 
     @Override
     public void onRestartGame() {
-        // TODO
+        gameManage.removeDot();
         updateAverageReaction(0);
         resetTimer();
         startGame();
@@ -156,7 +158,6 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
     @Override
     public void onExitGame() {
         startTime = 60000;
-        // остановка всех игровых процессов
         if (gameManage != null) {
             gameManage.pause();
         }

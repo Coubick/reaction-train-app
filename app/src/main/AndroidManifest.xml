@@ -12,16 +12,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
         <activity
+            android:screenOrientation="landscape"
             android:name=".PauseDialogFragment"
             android:exported="false"
             tools:ignore="Instantiatable" />
         <activity
+            android:screenOrientation="landscape"
             android:name=".StatisticsActivity"
             android:exported="false" />
         <activity
+            android:screenOrientation="landscape"
             android:name=".GameActivity"
             android:exported="false" />
         <activity
+            android:screenOrientation="landscape"
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
