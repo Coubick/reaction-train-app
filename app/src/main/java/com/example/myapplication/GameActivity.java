@@ -22,6 +22,7 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
     private GameManage gameManage;
     private static long startTime = 60000;
     private TextView textViewCountDown;
+    private TextView textViewClickedDotsAmount;
     private long timeLeft = startTime;
     private CountDownTimer mainCountDownTimer;
     private boolean isTimerRunning;
@@ -31,7 +32,7 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
     private long prepareTimeLeft = PREPARE_TIME;
     private TextView averageReactionView;
 
-    @SuppressLint("WrongViewCast")
+    @SuppressLint({"WrongViewCast", "MissingInflatedId"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +42,7 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
 
         textViewPrepareCountDown = findViewById(R.id.initial_countdown);
         textViewCountDown = findViewById(R.id.timer_text_view);
+        textViewClickedDotsAmount = findViewById(R.id.dots_amount_text_view);
         textViewCountDown.setText("00:60:00");
         averageReactionView = findViewById(R.id.average_reaction_text_view);
         pauseButton = findViewById(R.id.pause_button);
@@ -62,7 +64,6 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
             }
         });
     }
-
 
     private void startGame(){
         gameManage = new GameManage(this);
@@ -151,6 +152,7 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
     public void onRestartGame() {
         gameManage.removeDot();
         updateAverageReaction(0);
+        updateClickedDotsAmountText(0);
         resetTimer();
         startGame();
     }
@@ -201,6 +203,10 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
         int milliseconds = (int) (timeLeft % 1000) / 10;
         String timeLeft = String.format(Locale.getDefault(), "%02d:%02d:%02d", minutes, seconds, milliseconds);
         textViewCountDown.setText(timeLeft);
+    }
+
+    public void updateClickedDotsAmountText(int c){
+        textViewClickedDotsAmount.setText(String.format("dots clicked: %s", c));
     }
 
     public void updateAverageReaction(long time) {

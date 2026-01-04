@@ -36,6 +36,19 @@
         app:layout_constraintStart_toEndOf="@+id/timer_text_view"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/dots_amount_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="196dp"
+        android:layout_marginBottom="29dp"
+        android:text="@string/dots_clicked"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/game_field"
+        app:layout_constraintStart_toEndOf="@+id/timer_text_view"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ImageButton
         android:id="@+id/pause_button"
         style="@style/Widget.AppCompat.Button.Borderless.Colored"

@@ -15,20 +15,14 @@ public class GameManage{
     ConstraintLayout gameField;
     private final Random random = new Random();
     private final GameActivity activity;
-
     private ImageButton dot;
-
     private boolean isRunning = false;
     private long lastDotTime;
-
     private long pauseBeginTime;
+    private int clickedDotsAmount = 0;
     private long fullPauseTime = 0;
-
-
     private final long PREPARE_TIME = 4000;
-
     private boolean isDotActive = false;
-
     private boolean isPreparationPeriod = false;
     private final Handler spawnHandler = new Handler(Looper.getMainLooper());
 
@@ -77,6 +71,8 @@ public class GameManage{
             dot.setOnClickListener(v -> {
                 isDotActive = false;
                 long reactionTime = System.currentTimeMillis() - lastDotTime - fullPauseTime;
+                clickedDotsAmount++;
+                activity.updateClickedDotsAmountText(clickedDotsAmount);
                 System.out.println("!!!!!!!!!!!!!!!!! R E A C T I O N  T I M E: " + reactionTime);
                 fullPauseTime = 0;
                 recordReactionTime(reactionTime);
@@ -84,6 +80,7 @@ public class GameManage{
                 spawnNextDot();
             });
         }
+
         gameField.addView(dot);
         lastDotTime = System.currentTimeMillis();
     }
@@ -152,6 +149,8 @@ public class GameManage{
     private void resetGameStats(){
         totalClicks = 0;
         totalReactionTime = 0;
+        clickedDotsAmount = 0;
+
     }
 
     public void removeDot(){

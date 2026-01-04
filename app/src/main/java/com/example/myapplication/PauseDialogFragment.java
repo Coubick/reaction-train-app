@@ -13,8 +13,6 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 
-
-
 public class PauseDialogFragment extends DialogFragment {
 
     private PauseMenuListener listener;
