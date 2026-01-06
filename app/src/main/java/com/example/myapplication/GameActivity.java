@@ -14,13 +14,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.fragment.app.DialogFragment;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class GameActivity extends AppCompatActivity implements PauseDialogFragment.PauseMenuListener, FinishDialogFragment.FinishMenuListener{
     private TextView textViewPrepareCountDown;
     private AppCompatImageButton pauseButton;
     private GameManage gameManage;
-    private static long startTime = 60000;
+    private static long startTime = 15000;
     private TextView textViewCountDown;
     private TextView textViewClickedDotsAmount;
     private long timeLeft = startTime;
@@ -179,7 +181,8 @@ public class GameActivity extends AppCompatActivity implements PauseDialogFragme
     }
 
     private void openFinishDialog() {
-        DialogFragment dialogFragment = new FinishDialogFragment();
+        ArrayList<Long> allReactions = gameManage.getReactionsList();
+        DialogFragment dialogFragment = new FinishDialogFragment(allReactions);
         dialogFragment.show(getSupportFragmentManager(), "example");
     }
 

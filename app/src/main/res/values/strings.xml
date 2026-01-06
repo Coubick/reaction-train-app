@@ -12,5 +12,6 @@
     <string name="finish_text">Finish</string>
     <string name="resume_button">Resume</string>
     <string name="exit_button">Exit</string>
+    <string name="element_text"></string>
     <string name="reset_button">Restart</string>
 </resources>

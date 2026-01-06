@@ -7,6 +7,8 @@ import android.widget.ImageButton;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class GameManage{
@@ -25,6 +27,8 @@ public class GameManage{
     private boolean isDotActive = false;
     private boolean isPreparationPeriod = false;
     private final Handler spawnHandler = new Handler(Looper.getMainLooper());
+
+    private List<Long> reactionTimes = new ArrayList<>();
 
     private void spawnNextDot() {
         if (!isRunning || isDotActive) return;
@@ -73,7 +77,7 @@ public class GameManage{
                 long reactionTime = System.currentTimeMillis() - lastDotTime - fullPauseTime;
                 clickedDotsAmount++;
                 activity.updateClickedDotsAmountText(clickedDotsAmount);
-                System.out.println("!!!!!!!!!!!!!!!!! R E A C T I O N  T I M E: " + reactionTime);
+                reactionTimes.add(reactionTime);
                 fullPauseTime = 0;
                 recordReactionTime(reactionTime);
                 gameField.removeView(v);
@@ -161,5 +165,9 @@ public class GameManage{
         }
 
         spawnHandler.removeCallbacksAndMessages(null);
+    }
+
+    public ArrayList<Long> getReactionsList() {
+        return new ArrayList<>(reactionTimes);
     }
 }
